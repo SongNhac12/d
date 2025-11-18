@@ -27,8 +27,6 @@ local purchaseGear = ReplicatedStorage:WaitForChild("rbxts_include")
 
 local argsBait = { [1] = "baitpack:Atlantis" }
 local argsFood = { [1] = "FoodScoop" }
-
--- ✨ THÊM CODE MỚI YOU YÊU CẦU
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 
 --=====================================================
@@ -37,6 +35,7 @@ local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 
 _G.AutoShop = true
 _G.AutoCraft = true
+_G.AutoBait = true  -- ⭐ Điều khiển Auto Bait
 
 --=====================================================
 --  AUTO CRAFT FUNCTION
@@ -76,10 +75,13 @@ end
 task.spawn(function()
     while true do
         if _G.AutoShop then
-            purchaseEventItem:FireServer(unpack(argsBait))
-            purchaseGear:FireServer(unpack(argsFood))
             
-            -- ✨ THÊM VÀO AUTO SHOP
+            -- ⭐ Auto Bait ON/OFF
+            if _G.AutoBait then
+                purchaseEventItem:FireServer(unpack(argsBait))
+            end
+
+            purchaseGear:FireServer(unpack(argsFood))
             purchaseGear:FireServer(unpack(argsFeeder))
         end
         task.wait(1)
@@ -103,7 +105,7 @@ local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local Frame = Instance.new("Frame", ScreenGui)
 local UICorner = Instance.new("UICorner", Frame)
 
-Frame.Size = UDim2.new(0, 190, 0, 120)
+Frame.Size = UDim2.new(0, 200, 0, 170)
 Frame.Position = UDim2.new(0.05, 0, 0.3, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 
@@ -126,7 +128,12 @@ end)
 game:GetService("UserInputService").InputChanged:Connect(function(input)
     if dragToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
         local delta = input.Position - dragStart
-        Frame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        Frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
     end
 end)
 
@@ -148,9 +155,9 @@ local function createBtn(text, order)
     return btn
 end
 
--- DEFAULT BUTTON TEXT = ON
 local shopBtn = createBtn("Auto Shop: ON", 1)
 local craftBtn = createBtn("Auto Craft: ON", 2)
+local baitBtn = createBtn("Auto Bait: ON", 3) -- ⭐ Nút Auto Bait mới
 
 shopBtn.MouseButton1Click:Connect(function()
     _G.AutoShop = not _G.AutoShop
@@ -160,4 +167,9 @@ end)
 craftBtn.MouseButton1Click:Connect(function()
     _G.AutoCraft = not _G.AutoCraft
     craftBtn.Text = "Auto Craft: " .. (_G.AutoCraft and "ON" or "OFF")
+end)
+
+baitBtn.MouseButton1Click:Connect(function()
+    _G.AutoBait = not _G.AutoBait
+    baitBtn.Text = "Auto Bait: " .. (_G.AutoBait and "ON" or "OFF")
 end)
