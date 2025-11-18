@@ -28,6 +28,9 @@ local purchaseGear = ReplicatedStorage:WaitForChild("rbxts_include")
 local argsBait = { [1] = "baitpack:Atlantis" }
 local argsFood = { [1] = "FoodScoop" }
 
+-- ✨ THÊM CODE MỚI YOU YÊU CẦU
+local argsFeeder = { [1] = "AdvancedAutoFeeder" }
+
 --=====================================================
 --  SCRIPT CONTROL (DEFAULT = TRUE)
 --=====================================================
@@ -75,6 +78,9 @@ task.spawn(function()
         if _G.AutoShop then
             purchaseEventItem:FireServer(unpack(argsBait))
             purchaseGear:FireServer(unpack(argsFood))
+            
+            -- ✨ THÊM VÀO AUTO SHOP
+            purchaseGear:FireServer(unpack(argsFeeder))
         end
         task.wait(1)
     end
