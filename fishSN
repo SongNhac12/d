@@ -30,12 +30,33 @@ local argsFood = { [1] = "FoodScoop" }
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 
 --=====================================================
+--  EXTRA ITEMS YOU REQUESTED
+--=====================================================
+
+local AutoItems = {
+    { [1] = "BasicAutoFeeder" },
+    { [1] = "FoodScoop" },
+    { [1] = "BasicFoodTray" },
+    { [1] = "NetMover" },
+    { [1] = "MagnifyingGlass" },
+    { [1] = "AdvancedAutoFeeder" },
+    { [1] = "XPCookie" },
+    { [1] = "TeleportWand" },
+    { [1] = "StarLock" },
+    { [1] = "SupremeAutoFeeder" },
+    { [1] = "PetToy" },
+    { [1] = "EggHatcher" },
+    { [1] = "GoldenCookie" },
+    { [1] = "EggIncubator" }
+}
+
+--=====================================================
 --  SCRIPT CONTROL (DEFAULT = TRUE)
 --=====================================================
 
 _G.AutoShop = true
 _G.AutoCraft = true
-_G.AutoBait = true  -- ⭐ Điều khiển Auto Bait
+_G.AutoBait = true
 
 --=====================================================
 --  AUTO CRAFT FUNCTION
@@ -76,14 +97,20 @@ task.spawn(function()
     while true do
         if _G.AutoShop then
             
-            -- ⭐ Auto Bait ON/OFF
             if _G.AutoBait then
                 purchaseEventItem:FireServer(unpack(argsBait))
             end
 
+            -- original 2
             purchaseGear:FireServer(unpack(argsFood))
             purchaseGear:FireServer(unpack(argsFeeder))
+
+            -- ⭐ added 14 items auto purchase
+            for _, item in ipairs(AutoItems) do
+                purchaseGear:FireServer(unpack(item))
+            end
         end
+
         task.wait(1)
     end
 end)
@@ -157,7 +184,7 @@ end
 
 local shopBtn = createBtn("Auto Shop: ON", 1)
 local craftBtn = createBtn("Auto Craft: ON", 2)
-local baitBtn = createBtn("Auto Bait: ON", 3) -- ⭐ Nút Auto Bait mới
+local baitBtn = createBtn("Auto Bait: ON", 3)
 
 shopBtn.MouseButton1Click:Connect(function()
     _G.AutoShop = not _G.AutoShop
