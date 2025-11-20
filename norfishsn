@@ -1,14 +1,13 @@
 --=====================================================
---  ANTI AFK
+-- ANTI AFK
 --=====================================================
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Genesisuii/Genesisuii/refs/heads/main/Anti%20AFK%20script", true))()
 
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 
 --=====================================================
---  SHOP EVENTS
+-- SHOP EVENTS
 --=====================================================
-
 local purchaseEventItem = ReplicatedStorage:WaitForChild("rbxts_include")
     :WaitForChild("node_modules")
     :WaitForChild("@rbxts")
@@ -30,15 +29,14 @@ local argsFood = { [1] = "FoodScoop" }
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 
 --=====================================================
---  SCRIPT CONTROL
+-- SCRIPT CONTROL (DEFAULT = TRUE)
 --=====================================================
-
 _G.AutoShop = true
 _G.AutoCraft = true
 _G.AutoBait = true
 
 --=====================================================
---  AUTO CRAFT FUNCTION
+-- AUTO CRAFT FUNCTION
 --=====================================================
 local function doCraft()
     if not _G.AutoCraft then return end
@@ -67,27 +65,18 @@ local function doCraft()
 end
 
 --=====================================================
---  THREAD LOOPS
+-- THREAD LOOPS
 --=====================================================
-
 task.spawn(function()
     while true do
         if _G.AutoShop then
-            
             if _G.AutoBait then
                 purchaseEventItem:FireServer(unpack(argsBait))
             end
 
-            -- original 2 items
             purchaseGear:FireServer(unpack(argsFood))
             purchaseGear:FireServer(unpack(argsFeeder))
-
-            -- ⭐ auto purchase 14 items
-            for _, item in ipairs(AutoItems) do
-                purchaseGear:FireServer(unpack(item))
-            end
         end
-
         task.wait(1)
     end
 end)
@@ -102,9 +91,8 @@ task.spawn(function()
 end)
 
 --=====================================================
---  SIMPLE UI
+-- SIMPLE UI (DRAGGABLE)
 --=====================================================
-
 local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local Frame = Instance.new("Frame", ScreenGui)
 local UICorner = Instance.new("UICorner", Frame)
@@ -142,9 +130,8 @@ game:GetService("UserInputService").InputChanged:Connect(function(input)
 end)
 
 --=====================================================
---  BUTTONS
+-- BUTTONS
 --=====================================================
-
 local function createBtn(text, order)
     local btn = Instance.new("TextButton", Frame)
     btn.Size = UDim2.new(1, -20, 0, 40)
@@ -154,14 +141,13 @@ local function createBtn(text, order)
     btn.Font = Enum.Font.GothamMedium
     btn.TextSize = 16
     btn.Text = text
-
     Instance.new("UICorner", btn)
     return btn
 end
 
-local shopBtn = createBtn("Auto Shop: ON", 1)
+local shopBtn  = createBtn("Auto Shop: ON", 1)
 local craftBtn = createBtn("Auto Craft: ON", 2)
-local baitBtn = createBtn("Auto Bait: ON", 3)
+local baitBtn  = createBtn("Auto Bait: ON", 3)
 
 shopBtn.MouseButton1Click:Connect(function()
     _G.AutoShop = not _G.AutoShop
