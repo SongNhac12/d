@@ -1,0 +1,271 @@
+--=====================================================
+--  ANTI AFK
+--=====================================================
+loadstring(game:HttpGet("https://raw.githubusercontent.com/Genesisuii/Genesisuii/refs/heads/main/Anti%20AFK%20script", true))()
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+--=====================================================
+--  SHOP EVENTS
+--=====================================================
+local purchaseEventItem = ReplicatedStorage:WaitForChild("rbxts_include")
+    :WaitForChild("node_modules")
+    :WaitForChild("@rbxts")
+    :WaitForChild("remo")
+    :WaitForChild("src")
+    :WaitForChild("container")
+    :WaitForChild("shop.purchaseEventItem")
+
+local purchaseGear = ReplicatedStorage:WaitForChild("rbxts_include")
+    :WaitForChild("node_modules")
+    :WaitForChild("@rbxts")
+    :WaitForChild("remo")
+    :WaitForChild("src")
+    :WaitForChild("container")
+    :WaitForChild("shop.purchaseGear")
+
+local purchaseEgg = ReplicatedStorage:WaitForChild("rbxts_include")
+    :WaitForChild("node_modules")
+    :WaitForChild("@rbxts")
+    :WaitForChild("remo")
+    :WaitForChild("src")
+    :WaitForChild("container")
+    :WaitForChild("shop.purchaseEgg")
+
+local purchaseBait = ReplicatedStorage:WaitForChild("rbxts_include")
+    :WaitForChild("node_modules")
+    :WaitForChild("@rbxts")
+    :WaitForChild("remo")
+    :WaitForChild("src")
+    :WaitForChild("container")
+    :WaitForChild("shop.purchaseBait")
+
+--=====================================================
+--  ARGS
+--=====================================================
+local argsEggAtlantis = { [1] = "egg:Atlantis" }
+local argsFood = { [1] = "FoodScoop" }
+local argsFeeder = { [1] = "AdvancedAutoFeeder" }
+local argsEggTropical = { [1] = "Tropical" }
+local argsEggEtoxic   = { [1] = "Etoxic" }
+local argsBaitMegalodon = { [1] = "Megalodon" }
+local argsBaitKraken = { [1] = "Kraken" }
+
+--=====================================================
+--  EXTRA ITEMS
+--=====================================================
+local AutoItems = {
+    { [1] = "BasicAutoFeeder" },
+    { [1] = "FoodScoop" },
+    { [1] = "BasicFoodTray" },
+    { [1] = "NetMover" },
+    { [1] = "MagnifyingGlass" },
+    { [1] = "AdvancedAutoFeeder" },
+    { [1] = "XpCookie" },
+    { [1] = "TeleportWand" },
+    { [1] = "StarLock" },
+    { [1] = "SupremeAutoFeeder" },
+    { [1] = "PetToy" },
+    { [1] = "EggHatcher" },
+    { [1] = "GoldenCookie" },
+    { [1] = "ExtremeAutoFeeder" },
+    { [1] = "AdvancedFoodTray" },
+    { [1] = "EggIncubator" }
+}
+
+--=====================================================
+--  SCRIPT CONTROL
+--=====================================================
+_G.AutoShop = true
+_G.AutoCraft = true
+_G.AutoBait = true
+_G.AutoEgg = true
+local runningBobaAshen = false
+local runningShopBait = false -- ⭐ thêm biến mới cho Megalodon & Kraken
+
+--=====================================================
+--  AUTO CRAFT
+--=====================================================
+local function doCraft()
+    if not _G.AutoCraft then return end
+
+    local args = { "TimeJumper", "gear" }
+    ReplicatedStorage.rbxts_include.node_modules["@rbxts"].remo.src.container["crafting.selectCraftingItem"]:FireServer(unpack(args))
+
+    task.wait(0.5)
+
+    local args2 = {
+        { "TeleportWand", "MagnifyingGlass", "AdvancedAutoFeeder" },
+        "gear"
+    }
+    ReplicatedStorage.rbxts_include.node_modules["@rbxts"].remo.src.container["crafting.submitItems"]:FireServer(unpack(args2))
+
+    task.wait(0.5)
+
+    local args3 = { "gear" }
+    ReplicatedStorage.rbxts_include.node_modules["@rbxts"].remo.src.container["crafting.startCraft"]:FireServer(unpack(args3))
+
+    for i = 1, 600 do
+        if not _G.AutoCraft then return end
+        task.wait(1)
+    end
+
+    local args4 = { "gear" }
+    ReplicatedStorage.rbxts_include.node_modules["@rbxts"].remo.src.container["crafting.collectCraft"]:FireServer(unpack(args4))
+end
+
+--=====================================================
+--  THREAD LOOPS
+--=====================================================
+-- Auto Shop + Auto Egg
+task.spawn(function()
+    while true do
+        if _G.AutoShop then
+            if _G.AutoBait then
+                -- Auto Egg Atlantis
+                purchaseEventItem:FireServer(unpack(argsEggAtlantis))
+            end
+
+            purchaseGear:FireServer(unpack(argsFood))
+            purchaseGear:FireServer(unpack(argsFeeder))
+
+            for _, item in ipairs(AutoItems) do
+                purchaseGear:FireServer(unpack(item))
+            end
+
+            if _G.AutoEgg then
+                purchaseEgg:FireServer(unpack(argsEggTropical))
+                purchaseEgg:FireServer(unpack(argsEggEtoxic))
+            end
+        end
+        task.wait(1)
+    end
+end)
+
+-- Auto Craft
+task.spawn(function()
+    while true do
+        if _G.AutoCraft then
+            doCraft()
+        end
+        task.wait(1)
+    end
+end)
+
+-- Auto Boba & Ashen
+task.spawn(function()
+    while true do
+        if runningBobaAshen then
+            local Rep = game:GetService("ReplicatedStorage")
+            local remote = Rep.rbxts_include.node_modules["@rbxts"].remo.src.container["merchant.purchaseItem"]
+
+            local function fire(typeName)
+                remote:FireServer({[1]="travelling",[2]=typeName})
+            end
+
+            fire("Boba")
+            fire("Ashen")
+        end
+        task.wait(1)
+    end
+end)
+
+-- Auto Shop Bait Megalodon & Kraken
+task.spawn(function()
+    while true do
+        if runningShopBait then
+            purchaseBait:FireServer(unpack(argsBaitMegalodon))
+            purchaseBait:FireServer(unpack(argsBaitKraken))
+        end
+        task.wait(1)
+    end
+end)
+
+--=====================================================
+--  SIMPLE DRAGGABLE UI
+--=====================================================
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+local Frame = Instance.new("Frame", ScreenGui)
+local UICorner = Instance.new("UICorner", Frame)
+
+Frame.Size = UDim2.new(0, 200, 0, 300)
+Frame.Position = UDim2.new(0.05, 0, 0.3, 0)
+Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+
+local dragToggle, dragStart, startPos
+Frame.InputBegan:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragToggle = true
+        dragStart = input.Position
+        startPos = Frame.Position
+    end
+end)
+Frame.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 then
+        dragToggle = false
+    end
+end)
+game:GetService("UserInputService").InputChanged:Connect(function(input)
+    if dragToggle and input.UserInputType == Enum.UserInputType.MouseMovement then
+        local delta = input.Position - dragStart
+        Frame.Position = UDim2.new(
+            startPos.X.Scale,
+            startPos.X.Offset + delta.X,
+            startPos.Y.Scale,
+            startPos.Y.Offset + delta.Y
+        )
+    end
+end)
+
+--=====================================================
+--  BUTTONS
+--=====================================================
+local function createBtn(text, order)
+    local btn = Instance.new("TextButton", Frame)
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, 10 + (order - 1) * 45)
+    btn.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.GothamMedium
+    btn.TextSize = 16
+    btn.Text = text
+    Instance.new("UICorner", btn)
+    return btn
+end
+
+local shopBtn      = createBtn("Shop Gear: ON", 1)
+local craftBtn     = createBtn("Auto Craft: ON", 2)
+local baitBtn      = createBtn("Auto Egg Event: ON", 3)
+local eggBtn       = createBtn("Auto Egg: ON", 4)
+local bobaAshenBtn = createBtn("Shop Merchant: ON", 5)
+local shopBaitBtn  = createBtn("Shop: ON", 6) -- ⭐ nút mới
+
+shopBtn.MouseButton1Click:Connect(function()
+    _G.AutoShop = not _G.AutoShop
+    shopBtn.Text = "Shop Gear: " .. (_G.AutoShop and "ON" or "OFF")
+end)
+
+craftBtn.MouseButton1Click:Connect(function()
+    _G.AutoCraft = not _G.AutoCraft
+    craftBtn.Text = "Auto Craft: " .. (_G.AutoCraft and "ON" or "OFF")
+end)
+
+baitBtn.MouseButton1Click:Connect(function()
+    _G.AutoBait = not _G.AutoBait
+    baitBtn.Text = "Auto Egg Event: " .. (_G.AutoBait and "ON" or "OFF")
+end)
+
+eggBtn.MouseButton1Click:Connect(function()
+    _G.AutoEgg = not _G.AutoEgg
+    eggBtn.Text = "Auto Egg: " .. (_G.AutoEgg and "ON" or "OFF")
+end)
+
+bobaAshenBtn.MouseButton1Click:Connect(function()
+    runningBobaAshen = not runningBobaAshen
+    bobaAshenBtn.Text = "Shop Merchant: " .. (runningBobaAshen and "ON" or "OFF")
+end)
+
+shopBaitBtn.MouseButton1Click:Connect(function()
+    runningShopBait = not runningShopBait
+    shopBaitBtn.Text = "Shop: " .. (runningShopBait and "ON" or "OFF")
+end)
