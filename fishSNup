@@ -235,9 +235,9 @@ end
 
 local shopBtn      = createBtn("Shop Gear: ON", 1)
 local craftBtn     = createBtn("Auto Craft: ON", 2)
-local baitBtn      = createBtn("Auto Egg Atlantis: ON", 3)
+local baitBtn      = createBtn("Auto Egg Event: ON", 3)
 local eggBtn       = createBtn("Auto Egg: ON", 4)
-local bobaAshenBtn = createBtn("Boba & Ashen: ON", 5)
+local bobaAshenBtn = createBtn("Shop Merchant: ON", 5)
 local shopBaitBtn  = createBtn("Shop: ON", 6) -- ⭐ nút mới
 
 shopBtn.MouseButton1Click:Connect(function()
@@ -252,7 +252,7 @@ end)
 
 baitBtn.MouseButton1Click:Connect(function()
     _G.AutoBait = not _G.AutoBait
-    baitBtn.Text = "Auto Egg Atlantis: " .. (_G.AutoBait and "ON" or "OFF")
+    baitBtn.Text = "Auto Egg Event: " .. (_G.AutoBait and "ON" or "OFF")
 end)
 
 eggBtn.MouseButton1Click:Connect(function()
@@ -262,7 +262,7 @@ end)
 
 bobaAshenBtn.MouseButton1Click:Connect(function()
     runningBobaAshen = not runningBobaAshen
-    bobaAshenBtn.Text = "Boba & Ashen: " .. (runningBobaAshen and "ON" or "OFF")
+    bobaAshenBtn.Text = "Shop Merchant: " .. (runningBobaAshen and "ON" or "OFF")
 end)
 
 shopBaitBtn.MouseButton1Click:Connect(function()
