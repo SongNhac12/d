@@ -58,6 +58,8 @@ local AutoItems = {
     { [1] = "PetToy" },
     { [1] = "EggHatcher" },
     { [1] = "GoldenCookie" },
+    { [1] = "ExtremeAutoFeeder" },
+    { [1] = "AdvancedFoodTray" },
     { [1] = "EggIncubator" }
 }
 
