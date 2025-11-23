@@ -35,7 +35,7 @@ local purchaseEgg = ReplicatedStorage:WaitForChild("rbxts_include")
 --=====================================================
 --  ARGS
 --=====================================================
-local argsBait = { [1] = "baitpack:Atlantis" }
+local argsEggAtlantis = { [1] = "egg:Atlantis" } -- ⭐ thay đổi từ baitpack thành egg
 local argsFood = { [1] = "FoodScoop" }
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 local argsEggTropical = { [1] = "Tropical" }
@@ -109,7 +109,8 @@ task.spawn(function()
     while true do
         if _G.AutoShop then
             if _G.AutoBait then
-                purchaseEventItem:FireServer(unpack(argsBait))
+                -- ⭐ gọi egg Atlantis thay cho baitpack
+                purchaseEventItem:FireServer(unpack(argsEggAtlantis))
             end
 
             purchaseGear:FireServer(unpack(argsFood))
@@ -210,7 +211,7 @@ end
 
 local shopBtn      = createBtn("Auto Shop: ON", 1)
 local craftBtn     = createBtn("Auto Craft: ON", 2)
-local baitBtn      = createBtn("Auto Bait: ON", 3)
+local baitBtn      = createBtn("Auto Egg Atlantis: ON", 3) -- ⭐ đổi tên nút
 local eggBtn       = createBtn("Auto Egg: ON", 4)
 local bobaAshenBtn = createBtn("Boba & Ashen: ON", 5)
 
@@ -226,7 +227,7 @@ end)
 
 baitBtn.MouseButton1Click:Connect(function()
     _G.AutoBait = not _G.AutoBait
-    baitBtn.Text = "Auto Bait: " .. (_G.AutoBait and "ON" or "OFF")
+    baitBtn.Text = "Auto Egg Atlantis: " .. (_G.AutoBait and "ON" or "OFF")
 end)
 
 eggBtn.MouseButton1Click:Connect(function()
