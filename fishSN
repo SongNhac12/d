@@ -233,16 +233,16 @@ local function createBtn(text, order)
     return btn
 end
 
-local shopBtn      = createBtn("Auto Shop: ON", 1)
+local shopBtn      = createBtn("Shop Gear: ON", 1)
 local craftBtn     = createBtn("Auto Craft: ON", 2)
 local baitBtn      = createBtn("Auto Egg Atlantis: ON", 3)
 local eggBtn       = createBtn("Auto Egg: ON", 4)
 local bobaAshenBtn = createBtn("Boba & Ashen: ON", 5)
-local shopBaitBtn  = createBtn("Shop Megalodon/Kraken: ON", 6) -- ⭐ nút mới
+local shopBaitBtn  = createBtn("Shop: ON", 6) -- ⭐ nút mới
 
 shopBtn.MouseButton1Click:Connect(function()
     _G.AutoShop = not _G.AutoShop
-    shopBtn.Text = "Auto Shop: " .. (_G.AutoShop and "ON" or "OFF")
+    shopBtn.Text = "Shop Gear: " .. (_G.AutoShop and "ON" or "OFF")
 end)
 
 craftBtn.MouseButton1Click:Connect(function()
@@ -267,5 +267,5 @@ end)
 
 shopBaitBtn.MouseButton1Click:Connect(function()
     runningShopBait = not runningShopBait
-    shopBaitBtn.Text = "Shop Megalodon/Kraken: " .. (runningShopBait and "ON" or "OFF")
+    shopBaitBtn.Text = "Shop: " .. (runningShopBait and "ON" or "OFF")
 end)
