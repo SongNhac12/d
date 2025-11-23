@@ -47,7 +47,7 @@ local argsEggAtlantis = { [1] = "egg:Atlantis" }
 local argsFood = { [1] = "FoodScoop" }
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 local argsEggTropical = { [1] = "Tropical" }
-local argsEggEtoxic   = { [1] = "Etoxic" }
+local argsEggExotic   = { [1] = "Exotic" }
 local argsBaitMegalodon = { [1] = "Megalodon" }
 local argsBaitKraken = { [1] = "Kraken" }
 
@@ -135,7 +135,7 @@ task.spawn(function()
 
             if _G.AutoEgg then
                 purchaseEgg:FireServer(unpack(argsEggTropical))
-                purchaseEgg:FireServer(unpack(argsEggEtoxic))
+                purchaseEgg:FireServer(unpack(argsEggExotic))
             end
         end
         task.wait(1)
