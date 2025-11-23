@@ -32,14 +32,24 @@ local purchaseEgg = ReplicatedStorage:WaitForChild("rbxts_include")
     :WaitForChild("container")
     :WaitForChild("shop.purchaseEgg")
 
+local purchaseBait = ReplicatedStorage:WaitForChild("rbxts_include")
+    :WaitForChild("node_modules")
+    :WaitForChild("@rbxts")
+    :WaitForChild("remo")
+    :WaitForChild("src")
+    :WaitForChild("container")
+    :WaitForChild("shop.purchaseBait")
+
 --=====================================================
 --  ARGS
 --=====================================================
-local argsEggAtlantis = { [1] = "egg:Atlantis" } -- ⭐ thay đổi từ baitpack thành egg
+local argsEggAtlantis = { [1] = "egg:Atlantis" }
 local argsFood = { [1] = "FoodScoop" }
 local argsFeeder = { [1] = "AdvancedAutoFeeder" }
 local argsEggTropical = { [1] = "Tropical" }
 local argsEggEtoxic   = { [1] = "Etoxic" }
+local argsBaitMegalodon = { [1] = "Megalodon" }
+local argsBaitKraken = { [1] = "Kraken" }
 
 --=====================================================
 --  EXTRA ITEMS
@@ -71,6 +81,7 @@ _G.AutoCraft = true
 _G.AutoBait = true
 _G.AutoEgg = true
 local runningBobaAshen = false
+local runningShopBait = false -- ⭐ thêm biến mới cho Megalodon & Kraken
 
 --=====================================================
 --  AUTO CRAFT
@@ -111,7 +122,7 @@ task.spawn(function()
     while true do
         if _G.AutoShop then
             if _G.AutoBait then
-                -- ⭐ gọi egg Atlantis thay cho baitpack
+                -- Auto Egg Atlantis
                 purchaseEventItem:FireServer(unpack(argsEggAtlantis))
             end
 
@@ -159,6 +170,17 @@ task.spawn(function()
     end
 end)
 
+-- Auto Shop Bait Megalodon & Kraken
+task.spawn(function()
+    while true do
+        if runningShopBait then
+            purchaseBait:FireServer(unpack(argsBaitMegalodon))
+            purchaseBait:FireServer(unpack(argsBaitKraken))
+        end
+        task.wait(1)
+    end
+end)
+
 --=====================================================
 --  SIMPLE DRAGGABLE UI
 --=====================================================
@@ -166,7 +188,7 @@ local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
 local Frame = Instance.new("Frame", ScreenGui)
 local UICorner = Instance.new("UICorner", Frame)
 
-Frame.Size = UDim2.new(0, 200, 0, 260)
+Frame.Size = UDim2.new(0, 200, 0, 300)
 Frame.Position = UDim2.new(0.05, 0, 0.3, 0)
 Frame.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
 
@@ -213,9 +235,10 @@ end
 
 local shopBtn      = createBtn("Auto Shop: ON", 1)
 local craftBtn     = createBtn("Auto Craft: ON", 2)
-local baitBtn      = createBtn("Auto Egg Atlantis: ON", 3) -- ⭐ đổi tên nút
+local baitBtn      = createBtn("Auto Egg Atlantis: ON", 3)
 local eggBtn       = createBtn("Auto Egg: ON", 4)
 local bobaAshenBtn = createBtn("Boba & Ashen: ON", 5)
+local shopBaitBtn  = createBtn("Shop Megalodon/Kraken: ON", 6) -- ⭐ nút mới
 
 shopBtn.MouseButton1Click:Connect(function()
     _G.AutoShop = not _G.AutoShop
@@ -240,4 +263,9 @@ end)
 bobaAshenBtn.MouseButton1Click:Connect(function()
     runningBobaAshen = not runningBobaAshen
     bobaAshenBtn.Text = "Boba & Ashen: " .. (runningBobaAshen and "ON" or "OFF")
+end)
+
+shopBaitBtn.MouseButton1Click:Connect(function()
+    runningShopBait = not runningShopBait
+    shopBaitBtn.Text = "Shop Megalodon/Kraken: " .. (runningShopBait and "ON" or "OFF")
 end)
