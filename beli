@@ -1,7 +1,7 @@
 ---------------------------------------
--- 0. CHỜ 10 GIÂY CHO GAME LOAD FULL --
+-- 0. CHỜ 5 GIÂY CHO GAME LOAD FULL --
 ---------------------------------------
-print("Đang đợi 10s để load map + data...")
+print("Đang đợi 5s để load map + data...")
 task.wait(5)
 
 -----------------------------------
@@ -21,7 +21,6 @@ local root = char:WaitForChild("HumanoidRootPart")
 local TweenService = game:GetService("TweenService")
 local ChestFolder = workspace:WaitForChild("ChestModels")
 
--- Dùng vị trí để tránh bug
 local visitedPositions = {}
 
 local function posToKey(v3)
@@ -31,7 +30,6 @@ end
 local isFlying = false
 local currentTween
 
--- Tìm chest gần nhất CHƯA tới (theo position)
 local function getNearestChest()
     local nearest, shortest = nil, math.huge
 
@@ -40,7 +38,6 @@ local function getNearestChest()
             local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
             if p then
                 local key = posToKey(p.Position)
-
                 if not visitedPositions[key] then
                     local dist = (p.Position - root.Position).Magnitude
                     if dist < shortest then
@@ -55,7 +52,6 @@ local function getNearestChest()
     return nearest
 end
 
--- TWEEN BAY
 local function flyTo(part)
     if currentTween then currentTween:Cancel() end
     isFlying = true
@@ -75,80 +71,40 @@ local function flyTo(part)
     isFlying = false
 end
 
--- LOOP FARM
 task.spawn(function()
     while task.wait(0.15) do
         if isFlying then continue end
 
         local chest = getNearestChest()
-
         if chest then
             local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
-
             local key = posToKey(p.Position)
             visitedPositions[key] = true
-
             flyTo(p)
         end
     end
 end)
 
--- Auto Jump nhẹ
 task.spawn(function()
     while task.wait(1) do
         local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-        if hum then
-            hum:ChangeState(Enum.HumanoidStateType.Jumping)
-        end
-    end
-end)
-
--------------------------------------------
--- ⭐ FIX: RESET VISITED KHI CHEST SPAWN LẠI
--------------------------------------------
-local lastChestCount = #ChestFolder:GetChildren()
-
-task.spawn(function()
-    while task.wait(1) do
-        local currentCount = #ChestFolder:GetChildren()
-
-        if currentCount > lastChestCount then
-            print("✔ Chest mới spawn → reset visited list")
-            visitedPositions = {}  -- Reset để farm lại tất cả
-        end
-
-        lastChestCount = currentCount
+        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
     end
 end)
 
 -----------------------------
--- 3. AUTO HOP KHI HẾT CHEST
+-- 3. AUTO HOP 2 PHÚT 1 LẦN
 -----------------------------
 local TeleportService = game:GetService("TeleportService")
 local PLACE_ID = 4442272183
-
 local uniqueSeed = math.floor(tick()*1000) + math.random(1,999999)
 
-local function HopDifferent()
-    print("Hết chest → Hop server mới (seed =", uniqueSeed, ")")
-    while true do
-        TeleportService:Teleport(PLACE_ID, player, uniqueSeed)
-        task.wait(3)
-    end
-end
-
 task.spawn(function()
-    while task.wait(5) do
-        if #ChestFolder:GetChildren() == 0 then
-            print("Không còn chest → kiểm tra lại sau 5s...")
-            task.wait(5)
-
-            if #ChestFolder:GetChildren() == 0 then
-                HopDifferent()
-            else
-                print("✔ Chest vừa spawn lại → tiếp tục farm.")
-                visitedPositions = {}  -- reset farm lại
-            end
-        end
+    while true do
+        print("⌛ Chờ 2 phút để hop server...")
+        task.wait(120) -- 2 phút
+        print("👉 Đến giờ → hop server mới!")
+        TeleportService:Teleport(PLACE_ID, player, uniqueSeed)
+        task.wait(2)
     end
 end)
