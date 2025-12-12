@@ -1,16 +1,9 @@
----------------------------------------
--- 0. CHỜ 10 GIÂY CHO GAME LOAD FULL --
----------------------------------------
-print("Đang đợi 10s để load map + data...")
-task.wait(5)
-
 -----------------------------------
--- 1. SET TEAM MARINES --
+-- 1. SET TEAM MARINES
 -----------------------------------
 local args = { "SetTeam", "Marines" }
 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
 print("✔ Đã chọn team Marines")
-
 
 ----------------------
 -- 2. AUTO FARM CHEST
@@ -32,13 +25,25 @@ end
 local isFlying = false
 local currentTween
 
+----------------------------------------------------------------
+-- FIX: LẤY PRIMARYPART CÓ RETRY (ĐẢM BẢO CHEST VỪA SPAWN VẪN BAY)
+----------------------------------------------------------------
+local function getPrimary(chest)
+    for i = 1, 10 do -- retry 10 lần
+        local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
+        if p then return p end
+        task.wait(0.05)
+    end
+    return nil
+end
+
 -- Tìm chest gần nhất CHƯA tới (theo position)
 local function getNearestChest()
     local nearest, shortest = nil, math.huge
 
     for _, chest in ipairs(ChestFolder:GetChildren()) do
         if chest:IsA("Model") then
-            local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
+            local p = getPrimary(chest)
             if p then
                 local key = posToKey(p.Position)
 
@@ -84,12 +89,13 @@ task.spawn(function()
         local chest = getNearestChest()
 
         if chest then
-            local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
+            local p = getPrimary(chest)
+            if p then
+                local key = posToKey(p.Position)
+                visitedPositions[key] = true
 
-            local key = posToKey(p.Position)
-            visitedPositions[key] = true
-
-            flyTo(p)
+                flyTo(p)
+            end
         end
     end
 end)
@@ -104,13 +110,11 @@ task.spawn(function()
     end
 end)
 
-
 -----------------------------
 -- 3. AUTO HOP KHI HẾT CHEST
 -----------------------------
 local TeleportService = game:GetService("TeleportService")
 local PLACE_ID = 4442272183
-
 local uniqueSeed = math.floor(tick()*1000) + math.random(1,999999)
 
 local function HopDifferent()
@@ -131,7 +135,7 @@ task.spawn(function()
                 HopDifferent()
             else
                 print("Chest vừa spawn lại → tiếp tục farm.")
-                visitedPositions = {}  -- reset để farm lại
+                visitedPositions = {} -- reset lại để farm tiếp
             end
         end
     end
