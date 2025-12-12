@@ -2,7 +2,7 @@
 -- 0. CHỜ 10 GIÂY CHO GAME LOAD FULL --
 ---------------------------------------
 print("Đang đợi 10s để load map + data...")
-task.wait(10)
+task.wait(5)
 
 -----------------------------------
 -- 1. SET TEAM MARINES --
