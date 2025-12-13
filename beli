@@ -1,21 +1,11 @@
------------------------------
--- BIẾN TRẠNG THÁI TOÀN CỤC
------------------------------
-_G.IsTeleporting = false
-
 ---------------------------------------
--- 0. CHỜ GAME LOAD FULL
+-- 0. CHỜ 10 GIÂY CHO GAME LOAD FULL --
 ---------------------------------------
-local Players = game:GetService("Players")
-local player = Players.LocalPlayer
-
-print("⏳ Đang chờ character load...")
-player.CharacterAdded:Wait()
-task.wait(10) -- chờ map + data
-print("✔ Game đã load xong")
+print("Đang đợi 10s để load map + data...")
+task.wait(5)
 
 -----------------------------------
--- 1. SET TEAM MARINES
+-- 1. SET TEAM MARINES --
 -----------------------------------
 local args = { "SetTeam", "Marines" }
 game:GetService("ReplicatedStorage").Remotes.CommF_:InvokeServer(unpack(args))
@@ -25,11 +15,13 @@ print("✔ Đã chọn team Marines")
 -- 2. AUTO FARM CHEST
 ----------------------
 local FLY_SPEED = 250
+local player = game.Players.LocalPlayer
 local char = player.Character or player.CharacterAdded:Wait()
 local root = char:WaitForChild("HumanoidRootPart")
 local TweenService = game:GetService("TweenService")
 local ChestFolder = workspace:WaitForChild("ChestModels")
 
+-- Dùng vị trí để tránh bug
 local visitedPositions = {}
 
 local function posToKey(v3)
@@ -39,26 +31,16 @@ end
 local isFlying = false
 local currentTween
 
--- LẤY PRIMARYPART AN TOÀN
-local function getPrimary(chest)
-    for i = 1, 10 do
-        local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
-        if p then return p end
-        task.wait(0.05)
-    end
-    return nil
-end
-
--- TÌM CHEST GẦN NHẤT
+-- Tìm chest gần nhất CHƯA tới (theo position)
 local function getNearestChest()
-    if _G.IsTeleporting then return nil end
-
     local nearest, shortest = nil, math.huge
+
     for _, chest in ipairs(ChestFolder:GetChildren()) do
         if chest:IsA("Model") then
-            local p = getPrimary(chest)
+            local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
             if p then
                 local key = posToKey(p.Position)
+
                 if not visitedPositions[key] then
                     local dist = (p.Position - root.Position).Magnitude
                     if dist < shortest then
@@ -69,22 +51,23 @@ local function getNearestChest()
             end
         end
     end
+
     return nearest
 end
 
--- BAY ĐẾN CHEST
+-- TWEEN BAY
 local function flyTo(part)
-    if _G.IsTeleporting then return end
     if currentTween then currentTween:Cancel() end
-
     isFlying = true
-    local dist = (part.Position - root.Position).Magnitude
+
+    local pos = part.Position
+    local dist = (pos - root.Position).Magnitude
     local time = dist / FLY_SPEED
 
     currentTween = TweenService:Create(
         root,
         TweenInfo.new(time, Enum.EasingStyle.Linear),
-        { CFrame = CFrame.new(part.Position) }
+        { CFrame = CFrame.new(pos) }
     )
 
     currentTween:Play()
@@ -95,40 +78,46 @@ end
 -- LOOP FARM
 task.spawn(function()
     while task.wait(0.15) do
-        if _G.IsTeleporting or isFlying then continue end
+        if isFlying then continue end
 
         local chest = getNearestChest()
+
         if chest then
-            local p = getPrimary(chest)
-            if p then
-                visitedPositions[posToKey(p.Position)] = true
-                flyTo(p)
-            end
+            local p = chest.PrimaryPart or chest:FindFirstChildWhichIsA("BasePart")
+
+            local key = posToKey(p.Position)
+            visitedPositions[key] = true
+
+            flyTo(p)
         end
     end
 end)
 
--- AUTO JUMP
+-- Auto Jump nhẹ
 task.spawn(function()
     while task.wait(1) do
-        if _G.IsTeleporting then continue end
         local hum = player.Character and player.Character:FindFirstChildOfClass("Humanoid")
-        if hum then hum:ChangeState(Enum.HumanoidStateType.Jumping) end
+        if hum then
+            hum:ChangeState(Enum.HumanoidStateType.Jumping)
+        end
     end
 end)
 
 -------------------------------------------
--- RESET VISITED KHI CHEST SPAWN LẠI
+-- ⭐ FIX: RESET VISITED KHI CHEST SPAWN LẠI
 -------------------------------------------
 local lastChestCount = #ChestFolder:GetChildren()
+
 task.spawn(function()
     while task.wait(1) do
-        if _G.IsTeleporting then continue end
-        local current = #ChestFolder:GetChildren()
-        if current > lastChestCount then
-            visitedPositions = {}
+        local currentCount = #ChestFolder:GetChildren()
+
+        if currentCount > lastChestCount then
+            print("✔ Chest mới spawn → reset visited list")
+            visitedPositions = {}  -- Reset để farm lại tất cả
         end
-        lastChestCount = current
+
+        lastChestCount = currentCount
     end
 end)
 
@@ -137,21 +126,29 @@ end)
 -----------------------------
 local TeleportService = game:GetService("TeleportService")
 local PLACE_ID = 4442272183
+
 local uniqueSeed = math.floor(tick()*1000) + math.random(1,999999)
+
+local function HopDifferent()
+    print("Hết chest → Hop server mới (seed =", uniqueSeed, ")")
+    while true do
+        TeleportService:Teleport(PLACE_ID, player, uniqueSeed)
+        task.wait(3)
+    end
+end
 
 task.spawn(function()
     while task.wait(5) do
-        if _G.IsTeleporting then return end
-
         if #ChestFolder:GetChildren() == 0 then
-            print("🚀 Hết chest → hop server")
+            print("Không còn chest → kiểm tra lại sau 5s...")
+            task.wait(5)
 
-            _G.IsTeleporting = true
-            if currentTween then currentTween:Cancel() end
-
-            task.wait(2) -- cho script dừng hẳn
-            TeleportService:Teleport(PLACE_ID, player, uniqueSeed)
-            return -- RẤT QUAN TRỌNG: dừng script cũ
+            if #ChestFolder:GetChildren() == 0 then
+                HopDifferent()
+            else
+                print("✔ Chest vừa spawn lại → tiếp tục farm.")
+                visitedPositions = {}  -- reset farm lại
+            end
         end
     end
 end)
